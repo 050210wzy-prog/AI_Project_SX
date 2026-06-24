@@ -1,0 +1,111 @@
+:root {
+  color: #161a1d;
+  background: #eef3f7;
+  font-family: Inter, "Microsoft YaHei", Arial, sans-serif;
+  --ac-blue: #004b87;
+  --ac-blue-2: #0066b3;
+  --ac-green: #2e7d32;
+  --ac-red: #c41e3a;
+  --ac-ink: #1d2b39;
+  --ac-muted: #637282;
+  --ac-line: #d7e2ec;
+  --ac-bg: #eef3f7;
+  --ac-card: #ffffff;
+  --ac-shadow: 0 18px 42px rgba(0, 54, 96, .09);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, #f7fafc 0, #eef3f7 380px, #eef3f7 100%);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+a,
+.el-button {
+  transition: color .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.el-button {
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.el-button--primary {
+  --el-button-bg-color: var(--ac-blue-2);
+  --el-button-border-color: var(--ac-blue-2);
+  --el-button-hover-bg-color: #005a9f;
+  --el-button-hover-border-color: #005a9f;
+}
+
+.el-input__wrapper {
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--ac-line) inset;
+}
+
+.el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--ac-blue-2) inset, 0 8px 22px rgba(0, 102, 179, .12);
+}
+
+.el-breadcrumb {
+  font-size: 15px;
+}
+
+.el-breadcrumb__inner,
+.el-breadcrumb__inner a {
+  color: var(--ac-muted);
+  font-weight: 700;
+}
+
+.el-breadcrumb__inner.is-link:hover {
+  color: var(--ac-blue-2);
+}
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.glass-card {
+  border: 1px solid rgba(20, 24, 28, .12);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, .72);
+  box-shadow: 0 20px 60px rgba(16, 20, 24, .08);
+  backdrop-filter: blur(16px);
+}
+
+.hero {
+  min-height: 360px;
+  padding: 34px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: linear-gradient(135deg, rgba(19, 30, 26, .88), rgba(82, 112, 68, .58)), #334;
+}
+
+.hero h1 {
+  max-width: 880px;
+  margin: 12px 0;
+  font-size: clamp(42px, 7vw, 86px);
+  line-height: .95;
+  letter-spacing: 0;
+}
+
+.pill {
+  display: inline-flex;
+  width: fit-content;
+  border: 1px solid rgba(20, 24, 28, .18);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, .66);
+}

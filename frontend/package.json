@@ -1,0 +1,23 @@
+{
+  "name": "acvtc-enterprise-frontend",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config ./vite.config.cjs --host 0.0.0.0 --port 5173",
+    "build": "node ./build.mjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "2.3.1",
+    "axios": "1.7.9",
+    "element-plus": "2.8.8",
+    "pinia": "2.2.6",
+    "vue": "3.4.38",
+    "vue-router": "4.4.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "4.6.2",
+    "vite": "4.5.3"
+  }
+}

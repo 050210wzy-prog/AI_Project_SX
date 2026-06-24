@@ -1,0 +1,5 @@
+cd /d C:\Users\30587\Desktop\222\backend
+run_backend.bat
+
+cd /d C:\Users\30587\Desktop\222\frontend
+run_frontend.bat
