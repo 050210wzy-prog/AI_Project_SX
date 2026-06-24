@@ -10,6 +10,9 @@ __pycache__/
 uploads/
 backend/uploads/
 *.db
+!backend/data/app.db
 chroma_db/
 data/
+!backend/data/
+!backend/data/app.db
 scripts/
