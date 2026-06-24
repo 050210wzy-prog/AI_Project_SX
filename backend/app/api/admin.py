@@ -363,6 +363,8 @@ def academic_status(total_score: float, attendance: int, manual_status: str) -> 
 
 @router.get("/dashboard")
 def dashboard(db: Session = Depends(get_db), _: User = Depends(get_current_admin)) -> dict:
+    if db.query(Major).count() == 0 and db.query(SiteArticle).count() == 0:
+        seed_defaults(db)
     return {
         "majors": db.query(Major).count(),
         "scores": db.query(Score).count(),

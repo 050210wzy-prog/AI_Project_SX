@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { axiosBaseUrl } from './base'
 
 const studentHttp = axios.create({
-  baseURL: '/api',
+  baseURL: axiosBaseUrl,
   timeout: 30000
 })
 

@@ -7,7 +7,7 @@
       </div>
       <div class="status-panel">
         <span>{{ assistantMode === 'campus_life' ? '案例 A' : '模型' }}</span>
-        <strong>{{ assistantMode === 'campus_life' ? '校园百事通' : 'Spark-X2' }}</strong>
+        <strong>{{ assistantMode === 'campus_life' ? '校园百事通' : providerLabel }}</strong>
         <small>{{ assistantMode === 'campus_life' ? 'RAG 规则库 + 工具调用' : '优先官方数据，不足时明确提示' }}</small>
       </div>
     </section>
@@ -117,6 +117,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import http from '../api/http'
+import { apiUrl } from '../api/base'
 
 const route = useRoute()
 const question = ref('')
@@ -163,7 +164,7 @@ const providerLabel = computed(() => {
 const modeIntro = computed(() =>
   assistantMode.value === 'campus_life'
     ? '案例 A：校园生活百事通助手。支持请假、奖学金、报修、一卡通、选课等校园生活 RAG 问答，并提供教学周查询和绩点计算工具。'
-    : '接入讯飞星火 Spark-X2，结合本地招生、专业、官网采集数据，为考生、家长和师生提供咨询服务。'
+    : `接入${providerLabel.value}，结合本地招生、专业、官网采集数据，为考生、家长和师生提供咨询服务。`
 )
 const messages = ref([
   {
@@ -283,7 +284,7 @@ async function askStream() {
   loading.value = true
   scrollBottom()
   try {
-    const res = await fetch('/api/chat/stream', {
+    const res = await fetch(apiUrl('/chat/stream'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload(q, history))

@@ -45,3 +45,20 @@ def root() -> dict:
 @app.get("/health")
 def health() -> dict:
     return {"status": "healthy"}
+
+
+@app.get("/debug/counts")
+def debug_counts() -> dict:
+    from app.core.database import SessionLocal
+    from app.models.models import GradeRecord, Major, Score, SiteArticle, StudentRecord, User
+
+    with SessionLocal() as db:
+        return {
+            "database": "sqlite" if settings.use_sqlite else "mysql",
+            "users": db.query(User).count(),
+            "majors": db.query(Major).count(),
+            "scores": db.query(Score).count(),
+            "articles": db.query(SiteArticle).count(),
+            "students": db.query(StudentRecord).count(),
+            "grades": db.query(GradeRecord).count(),
+        }
