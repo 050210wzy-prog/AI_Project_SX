@@ -164,6 +164,28 @@ D:\python\python.exe backend\check_mysql.py
 - 正式部署时应修改 `SECRET_KEY`、管理员密码和数据库账号密码。
 - 如果要接入学校真实 WebVPN、邮箱或统一身份认证，需要学校提供实际系统地址和接口配置。
 
+### Render 无云 MySQL 部署
+
+如果只想把后端部署到 Render 演示，又没有云 MySQL，可以让后端使用 SQLite。Render 后端 Web Service 环境变量填写：
+
+```text
+APP_NAME=安徽交通职业技术学院官网与招生咨询系统
+DEBUG=false
+SECRET_KEY=在 Render 中 Generate 生成
+DATABASE_BACKEND=sqlite
+SQLITE_PATH=data/app.db
+ZHIPU_API_KEY=你的智谱 API Key
+ZHIPU_BASE_URL=https://open.bigmodel.cn/api/paas/v4/
+ZHIPU_MODEL=glm-4-flash
+CORS_ORIGINS=*
+EHALL_URL=https://ehall.acvtc.edu.cn/
+OA_URL=https://jyoa.acvtc.edu.cn/
+```
+
+此模式不需要填写 `MYSQL_HOST`、`MYSQL_USER`、`MYSQL_PASSWORD`、`MYSQL_DATABASE`。本地 `.env` 仍配置 MySQL 时，本机运行会继续使用 MySQL。
+
+注意：Render 免费实例的本地 SQLite 文件不适合长期保存正式数据，适合项目演示和答辩。正式上线仍建议使用云 MySQL。
+
 ## 初始化、测试与部署辅助
 
 初始化数据库和基础数据：

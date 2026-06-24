@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
@@ -10,7 +11,11 @@ class Base(DeclarativeBase):
     pass
 
 
-engine = create_engine(settings.database_url, pool_pre_ping=True, pool_recycle=3600)
+connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
+if settings.use_sqlite:
+    Path(settings.sqlite_path).parent.mkdir(parents=True, exist_ok=True)
+
+engine = create_engine(settings.database_url, pool_pre_ping=True, pool_recycle=3600, connect_args=connect_args)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
@@ -73,19 +78,10 @@ def _ensure_student_record_columns() -> None:
         "subject_name": "VARCHAR(80) NULL",
     }
     with engine.begin() as conn:
-        existing = {
-            row[0]
-            for row in conn.exec_driver_sql(
-                """
-                SELECT COLUMN_NAME
-                FROM INFORMATION_SCHEMA.COLUMNS
-                WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'student_records'
-                """
-            )
-        }
+        existing = _existing_columns(conn, "student_records")
         for name, definition in columns.items():
             if name not in existing:
-                conn.exec_driver_sql(f"ALTER TABLE student_records ADD COLUMN {name} {definition}")
+                conn.exec_driver_sql(f"ALTER TABLE student_records ADD COLUMN {name} {_column_definition(definition)}")
 
 
 def _ensure_grade_record_columns() -> None:
@@ -102,16 +98,35 @@ def _ensure_grade_record_columns() -> None:
         "status": "VARCHAR(50) NOT NULL DEFAULT '正常'",
     }
     with engine.begin() as conn:
-        existing = {
-            row[0]
-            for row in conn.exec_driver_sql(
-                """
-                SELECT COLUMN_NAME
-                FROM INFORMATION_SCHEMA.COLUMNS
-                WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'grade_records'
-                """
-            )
-        }
+        existing = _existing_columns(conn, "grade_records")
         for name, definition in columns.items():
             if name not in existing:
-                conn.exec_driver_sql(f"ALTER TABLE grade_records ADD COLUMN {name} {definition}")
+                conn.exec_driver_sql(f"ALTER TABLE grade_records ADD COLUMN {name} {_column_definition(definition)}")
+
+
+def _existing_columns(conn, table_name: str) -> set[str]:
+    if settings.use_sqlite:
+        return {row[1] for row in conn.exec_driver_sql(f"PRAGMA table_info({table_name})")}
+    return {
+        row[0]
+        for row in conn.exec_driver_sql(
+            f"""
+            SELECT COLUMN_NAME
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{table_name}'
+            """
+        )
+    }
+
+
+def _column_definition(definition: str) -> str:
+    if not settings.use_sqlite:
+        return definition
+    return (
+        definition.replace("VARCHAR(50)", "TEXT")
+        .replace("VARCHAR(80)", "TEXT")
+        .replace("VARCHAR(120)", "TEXT")
+        .replace("VARCHAR(180)", "TEXT")
+        .replace("INT", "INTEGER")
+        .replace("FLOAT", "REAL")
+    )

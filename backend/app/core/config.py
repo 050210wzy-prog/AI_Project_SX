@@ -1,5 +1,7 @@
 from functools import lru_cache
+from pathlib import Path
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,6 +17,9 @@ class Settings(BaseSettings):
     mysql_user: str = "root"
     mysql_password: str = ""
     mysql_database: str = "admission_system"
+    database_backend: str = "auto"
+    database_url_env: str = Field(default="", validation_alias="DATABASE_URL")
+    sqlite_path: str = "data/app.db"
 
     openai_api_key: str = ""
     openai_base_url: str = "https://api.openai.com/v1"
@@ -41,13 +46,31 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
+        if self.database_url_env:
+            return self.database_url_env
+        if self.use_sqlite:
+            db_path = Path(self.sqlite_path)
+            if not db_path.is_absolute():
+                db_path = Path.cwd() / db_path
+            return f"sqlite:///{db_path.as_posix()}"
         return (
             f"mysql+pymysql://{self.mysql_user}:{self.mysql_password}"
             f"@{self.mysql_host}:{self.mysql_port}/{self.mysql_database}?charset=utf8mb4"
         )
 
     @property
+    def use_sqlite(self) -> bool:
+        backend = self.database_backend.strip().lower()
+        if backend == "sqlite":
+            return True
+        if backend == "mysql":
+            return False
+        return not self.mysql_password and self.mysql_host in {"", "127.0.0.1", "localhost"}
+
+    @property
     def cors_origin_list(self) -> list[str]:
+        if self.cors_origins.strip() == "*":
+            return ["*"]
         return [item.strip() for item in self.cors_origins.split(",") if item.strip()]
 
 
