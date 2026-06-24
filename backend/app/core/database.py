@@ -30,6 +30,8 @@ def get_db() -> Generator[Session, None, None]:
 def init_db() -> None:
     from app.models.models import seed_defaults  # noqa: WPS433
 
+    backend = "SQLite" if settings.use_sqlite else "MySQL"
+    print(f"Database backend: {backend}")
     Base.metadata.create_all(bind=engine)
     _ensure_student_record_columns()
     _ensure_grade_record_columns()

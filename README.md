@@ -182,9 +182,11 @@ EHALL_URL=https://ehall.acvtc.edu.cn/
 OA_URL=https://jyoa.acvtc.edu.cn/
 ```
 
-此模式不需要填写 `MYSQL_HOST`、`MYSQL_USER`、`MYSQL_PASSWORD`、`MYSQL_DATABASE`。本地 `.env` 仍配置 MySQL 时，本机运行会继续使用 MySQL。
+此模式不需要填写 `MYSQL_HOST`、`MYSQL_USER`、`MYSQL_PASSWORD`、`MYSQL_DATABASE`。项目默认数据库后端为 SQLite；本地 `.env` 中已通过 `DATABASE_BACKEND=mysql` 明确启用 MySQL，因此本机运行会继续使用 MySQL。
 
 注意：Render 免费实例的本地 SQLite 文件不适合长期保存正式数据，适合项目演示和答辩。正式上线仍建议使用云 MySQL。
+
+项目根目录已提供 `runtime.txt`，用于把 Render 的 Python 版本固定到 3.11.9。不要删除该文件，否则 Render 可能使用过新的 Python 版本，导致 `pydantic-core`、`chromadb` 等依赖需要现场编译并构建失败。
 
 ## 初始化、测试与部署辅助
 

@@ -1,4 +1,5 @@
 from functools import lru_cache
+import os
 from pathlib import Path
 
 from pydantic import Field
@@ -17,7 +18,7 @@ class Settings(BaseSettings):
     mysql_user: str = "root"
     mysql_password: str = ""
     mysql_database: str = "admission_system"
-    database_backend: str = "auto"
+    database_backend: str = "sqlite"
     database_url_env: str = Field(default="", validation_alias="DATABASE_URL")
     sqlite_path: str = "data/app.db"
 
@@ -65,7 +66,9 @@ class Settings(BaseSettings):
             return True
         if backend == "mysql":
             return False
-        return not self.mysql_password and self.mysql_host in {"", "127.0.0.1", "localhost"}
+        if os.getenv("RENDER") and not self.database_url_env:
+            return True
+        return self.mysql_host in {"", "127.0.0.1", "localhost"}
 
     @property
     def cors_origin_list(self) -> list[str]:
