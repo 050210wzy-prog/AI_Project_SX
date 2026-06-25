@@ -90,14 +90,19 @@
         </div>
 
         <div class="composer">
-          <el-input
-            v-model="question"
-            type="textarea"
-            :rows="4"
-            resize="none"
-            placeholder="例如：安徽物理 430 分能报哪些专业？人工智能技术应用就业方向是什么？"
-            @keydown.enter.exact.prevent="askStream"
-          />
+          <div class="composer-input">
+            <el-input
+              v-model="question"
+              type="textarea"
+              :rows="4"
+              resize="none"
+              placeholder="例如：安徽物理 430 分能报哪些专业？人工智能技术应用就业方向是什么？"
+              @keydown.enter.exact.prevent="askStream"
+            />
+            <el-button class="mic-btn" :type="listening ? 'danger' : 'primary'" plain @click="toggleVoiceInput">
+              {{ listening ? '停止语音输入' : '语音输入' }}
+            </el-button>
+          </div>
           <div class="composer-actions">
             <span>{{ loading ? `${providerLabel} 正在生成回答...` : 'Enter 发送，Shift + Enter 换行' }}</span>
             <div>
@@ -130,7 +135,9 @@ const searchMode = ref('normal')
 const messageBox = ref(null)
 const voiceEnabled = ref(true)
 const isSpeaking = ref(false)
+const listening = ref(false)
 const lastSpokenAnswer = ref('')
+let recognition = null
 const modeOptions = [
   { label: '招生咨询', value: 'admissions' },
   { label: '校园生活', value: 'campus_life' }
@@ -244,6 +251,53 @@ function stopSpeech() {
 
 function replayLastAnswer() {
   if (lastSpokenAnswer.value) speakAnswer(lastSpokenAnswer.value)
+}
+
+function ensureRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition
+  if (!SR) return null
+  if (!recognition) {
+    recognition = new SR()
+    recognition.lang = 'zh-CN'
+    recognition.interimResults = true
+    recognition.continuous = false
+    recognition.onresult = (event) => {
+      let text = ''
+      for (let i = event.resultIndex; i < event.results.length; i += 1) {
+        text += event.results[i][0].transcript
+      }
+      question.value = text.trim()
+    }
+    recognition.onend = () => {
+      listening.value = false
+    }
+    recognition.onerror = () => {
+      listening.value = false
+      ElMessage.error('语音输入不可用，请改用手动输入')
+    }
+  }
+  return recognition
+}
+
+function toggleVoiceInput() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition
+  if (!SR) {
+    ElMessage.error('当前浏览器不支持语音输入')
+    return
+  }
+  const rec = ensureRecognition()
+  if (!rec) return
+  if (listening.value) {
+    rec.stop()
+    listening.value = false
+    return
+  }
+  try {
+    rec.start()
+    listening.value = true
+  } catch (error) {
+    listening.value = false
+  }
 }
 
 async function ask() {
@@ -602,6 +656,16 @@ onBeforeUnmount(() => stopSpeech())
   border-top: 1px solid #dfe9f1;
   background: #ffffff;
 }
+.composer-input {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: stretch;
+}
+.mic-btn {
+  min-width: 112px;
+  white-space: nowrap;
+}
 .composer-actions {
   display: flex;
   justify-content: space-between;
@@ -617,6 +681,9 @@ onBeforeUnmount(() => stopSpeech())
 @media (max-width: 980px) {
   .ai-hero,
   .chat-shell {
+    grid-template-columns: 1fr;
+  }
+  .composer-input {
     grid-template-columns: 1fr;
   }
   .composer-actions {
