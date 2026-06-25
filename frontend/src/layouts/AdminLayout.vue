@@ -16,6 +16,7 @@
           <p>{{ roleText }}</p>
         </div>
       </div>
+      <el-button class="direct-btn" type="primary" @click="router.push('/admin/dashboard')">直接进入后台首页</el-button>
 
       <el-menu router :default-active="route.path" class="admin-menu">
         <el-menu-item v-if="can('dashboard')" index="/admin/dashboard">
@@ -196,6 +197,11 @@ onMounted(() => auth.fetchMe())
   margin-top: 22px;
   border: 0;
   background: transparent;
+}
+.direct-btn {
+  width: 100%;
+  margin-top: 12px;
+  border-radius: 8px;
 }
 .admin-menu :deep(.el-menu-item) {
   height: 46px;
