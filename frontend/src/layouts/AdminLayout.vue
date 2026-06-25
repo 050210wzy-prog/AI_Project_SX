@@ -1,63 +1,67 @@
 <template>
   <el-container class="admin-shell">
     <el-aside width="280px" class="admin-aside">
-      <div class="brand">
-        <div class="brand-mark">A</div>
-        <div>
-          <h2>ACVTC 管理后台</h2>
-          <p>官网 / 招生 / 学工 / 教务</p>
+      <div class="aside-top">
+        <div class="brand">
+          <div class="brand-mark">A</div>
+          <div>
+            <h2>ACVTC 管理后台</h2>
+            <p>官网 / 招生 / 学工 / 教务</p>
+          </div>
         </div>
+
+        <div class="profile-card">
+          <span class="avatar">{{ auth.username?.slice(0, 1)?.toUpperCase() || 'A' }}</span>
+          <div>
+            <strong>{{ auth.username || '未登录' }}</strong>
+            <p>{{ roleText }}</p>
+          </div>
+        </div>
+        <el-button class="direct-btn" type="primary" @click="router.push('/admin/dashboard')">直接进入后台首页</el-button>
       </div>
 
-      <div class="profile-card">
-        <span class="avatar">{{ auth.username?.slice(0, 1)?.toUpperCase() || 'A' }}</span>
-        <div>
-          <strong>{{ auth.username || '未登录' }}</strong>
-          <p>{{ roleText }}</p>
-        </div>
-      </div>
-      <el-button class="direct-btn" type="primary" @click="router.push('/admin/dashboard')">直接进入后台首页</el-button>
+      <el-scrollbar class="menu-scroll">
+        <el-menu router :default-active="route.path" class="admin-menu">
+          <el-menu-item v-if="can('dashboard')" index="/admin/dashboard">
+            <el-icon><DataAnalysis /></el-icon>
+            <span>数据看板</span>
+          </el-menu-item>
+          <el-menu-item v-if="can('admissions')" index="/admin/admissions">
+            <el-icon><School /></el-icon>
+            <span>招生管理</span>
+          </el-menu-item>
+          <el-menu-item v-if="can('website')" index="/admin/website">
+            <el-icon><Monitor /></el-icon>
+            <span>官网管理</span>
+          </el-menu-item>
+          <el-menu-item v-if="can('crawler')" index="/admin/crawler">
+            <el-icon><Download /></el-icon>
+            <span>官网采集</span>
+          </el-menu-item>
+          <el-menu-item v-if="can('innovation')" index="/admin/innovation">
+            <el-icon><MagicStick /></el-icon>
+            <span>创新中心</span>
+          </el-menu-item>
+          <el-menu-item v-if="can('tickets')" index="/admin/tickets">
+            <el-icon><Service /></el-icon>
+            <span>咨询工单</span>
+          </el-menu-item>
 
-      <el-menu router :default-active="route.path" class="admin-menu">
-        <el-menu-item v-if="can('dashboard')" index="/admin/dashboard">
-          <el-icon><DataAnalysis /></el-icon>
-          <span>数据看板</span>
-        </el-menu-item>
-        <el-menu-item v-if="can('admissions')" index="/admin/admissions">
-          <el-icon><School /></el-icon>
-          <span>招生管理</span>
-        </el-menu-item>
-        <el-menu-item v-if="can('website')" index="/admin/website">
-          <el-icon><Monitor /></el-icon>
-          <span>官网管理</span>
-        </el-menu-item>
-        <el-menu-item v-if="can('crawler')" index="/admin/crawler">
-          <el-icon><Download /></el-icon>
-          <span>官网采集</span>
-        </el-menu-item>
-        <el-menu-item v-if="can('innovation')" index="/admin/innovation">
-          <el-icon><MagicStick /></el-icon>
-          <span>创新中心</span>
-        </el-menu-item>
-        <el-menu-item v-if="can('tickets')" index="/admin/tickets">
-          <el-icon><Service /></el-icon>
-          <span>咨询工单</span>
-        </el-menu-item>
-
-        <div class="menu-label">学校业务</div>
-        <el-menu-item v-if="can('students')" index="/admin/students">
-          <el-icon><UserFilled /></el-icon>
-          <span>学生管理</span>
-        </el-menu-item>
-        <el-menu-item v-if="can('academic')" index="/admin/academic">
-          <el-icon><Notebook /></el-icon>
-          <span>教务管理</span>
-        </el-menu-item>
-        <el-menu-item v-if="can('settings')" index="/admin/settings">
-          <el-icon><Setting /></el-icon>
-          <span>系统设置</span>
-        </el-menu-item>
-      </el-menu>
+          <div class="menu-label">学校业务</div>
+          <el-menu-item v-if="can('students')" index="/admin/students">
+            <el-icon><UserFilled /></el-icon>
+            <span>学生管理</span>
+          </el-menu-item>
+          <el-menu-item v-if="can('academic')" index="/admin/academic">
+            <el-icon><Notebook /></el-icon>
+            <span>教务管理</span>
+          </el-menu-item>
+          <el-menu-item v-if="can('settings')" index="/admin/settings">
+            <el-icon><Setting /></el-icon>
+            <span>系统设置</span>
+          </el-menu-item>
+        </el-menu>
+      </el-scrollbar>
 
       <div class="aside-footer">
         <el-button class="portal-btn" @click="router.push('/')">返回官网首页</el-button>
@@ -146,12 +150,20 @@ onMounted(() => auth.fetchMe())
   background: rgba(255, 255, 251, .86);
   backdrop-filter: blur(18px);
   box-shadow: 18px 0 45px rgba(20, 35, 32, .06);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+.aside-top {
+  display: grid;
+  gap: 12px;
+  flex: 0 0 auto;
 }
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
 }
 .brand-mark {
   width: 42px;
@@ -193,15 +205,19 @@ onMounted(() => auth.fetchMe())
   background: #111;
   color: #fff;
 }
-.admin-menu {
-  margin-top: 22px;
-  border: 0;
-  background: transparent;
-}
 .direct-btn {
   width: 100%;
   margin-top: 12px;
   border-radius: 8px;
+}
+.menu-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.admin-menu {
+  margin-top: 0;
+  border: 0;
+  background: transparent;
 }
 .admin-menu :deep(.el-menu-item) {
   height: 46px;
@@ -221,10 +237,7 @@ onMounted(() => auth.fetchMe())
   letter-spacing: .08em;
 }
 .aside-footer {
-  position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: 20px;
+  flex: 0 0 auto;
 }
 .portal-btn {
   width: 100%;
