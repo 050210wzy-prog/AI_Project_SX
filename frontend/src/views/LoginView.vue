@@ -6,6 +6,7 @@
       <el-input v-model="username" placeholder="用户名" />
       <el-input v-model="password" placeholder="密码" type="password" show-password />
       <el-button type="primary" size="large" :loading="loading" @click="login">登录后台</el-button>
+      <el-button size="large" :loading="loading" @click="quickLogin">直接进入后台</el-button>
     </el-card>
   </div>
 </template>
@@ -18,8 +19,8 @@ import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
 const auth = useAuthStore()
-const username = ref('')
-const password = ref('')
+const username = ref('admin')
+const password = ref('admin123')
 const loading = ref(false)
 
 async function login() {
@@ -37,6 +38,12 @@ async function login() {
   } finally {
     loading.value = false
   }
+}
+
+async function quickLogin() {
+  username.value = 'admin'
+  password.value = 'admin123'
+  await login()
 }
 </script>
 
